@@ -121,8 +121,8 @@ function ProductSearchContent() {
         const suggestedSalePrice =
           data.scraped.prices.length > 0 ? data.scraped.prices[0].price : 50;
 
-        // Tahmini alış fiyatı (esnafın değiştirmesi için)
-        const suggestedPurchase = Math.round(suggestedSalePrice * 0.75 * 100) / 100;
+        // İŞ KURALI: Alış fiyatı yüzde 40 kâr olacak şekilde öneri olarak otomatik oluşsun (Satış = Alış * 1.40)
+        const suggestedPurchase = Math.round((suggestedSalePrice / 1.40) * 100) / 100;
 
         setFormData({
           name: data.scraped.name,
@@ -134,7 +134,7 @@ function ProductSearchContent() {
 
         setStatusMessage({
           type: "info",
-          text: `Ürün veritabanında bulunamadı. Türkiye pazar yerlerinden (Cimri, Akakçe, Trendyol vb.) en güncel 5 fiyat çekildi.`,
+          text: `Ürün veritabanında bulunamadı. Pazar yerlerinden 5 fiyat çekildi ve %40 kâr önerisiyle alış fiyatı (₺${suggestedPurchase.toFixed(2)}) otomatik hesaplandı.`,
         });
       }
     } catch (err: any) {
@@ -426,7 +426,14 @@ function ProductSearchContent() {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setFormData((prev) => ({ ...prev, salePrice: p.price.toString() }))}
+                      onClick={() => {
+                        const autoPurchase = Math.round((p.price / 1.40) * 100) / 100;
+                        setFormData((prev) => ({
+                          ...prev,
+                          salePrice: p.price.toString(),
+                          purchasePrice: autoPurchase.toString(),
+                        }));
+                      }}
                       className={`p-3.5 rounded-2xl text-left border transition cursor-pointer relative ${
                         isSelected
                           ? "bg-emerald-500/20 border-emerald-500 text-white shadow-md shadow-emerald-500/20 scale-[1.02]"
@@ -445,7 +452,7 @@ function ProductSearchContent() {
                         ₺{p.price.toFixed(2)}
                       </p>
                       <span className="text-[10px] text-emerald-400 font-semibold">
-                        {isSelected ? "Seçildi" : "Bu Fiyatı Seç"}
+                        {isSelected ? "Seçildi (%40 Kâr)" : "Seç (%40 Kâr Hesapla)"}
                       </span>
                     </button>
                   );
@@ -490,11 +497,30 @@ function ProductSearchContent() {
                 />
               </div>
 
-              {/* Alış Fiyatı (purchasePrice) - Kâr hesabı için zorunlu kural */}
+              {/* Alış Fiyatı (purchasePrice) - %40 Kâr Önerisi ile */}
               <div>
-                <label className="block text-xs font-semibold text-emerald-400 mb-1.5">
-                  Alış Fiyatı (₺) * (Kâr Hesabı İçin)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-emerald-400">
+                    Alış Fiyatı (₺) * (Kâr Hesabı İçin)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const sale = parseFloat(formData.salePrice);
+                      if (sale > 0) {
+                        const calc = Math.round((sale / 1.40) * 100) / 100;
+                        setFormData((prev) => ({
+                          ...prev,
+                          purchasePrice: calc.toString(),
+                        }));
+                      }
+                    }}
+                    className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-0.5 rounded-lg border border-emerald-500/30 transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    <span>%40 Kâr Önerisi Uygula</span>
+                  </button>
+                </div>
                 <input
                   type="number"
                   step="0.01"
@@ -504,6 +530,9 @@ function ProductSearchContent() {
                   placeholder="0.00"
                   className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-emerald-500/40 text-white font-bold text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  %40 kâr ile otomatik önerilmiştir; dilediğiniz gibi değiştirebilirsiniz.
+                </p>
               </div>
 
               {/* Satış Fiyatı (salePrice) - 5 fiyattan biri veya manuel */}

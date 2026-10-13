@@ -11,6 +11,7 @@ import {
   Receipt,
   LogOut,
   Store,
+  Database,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -46,6 +47,11 @@ export default function Navbar() {
       label: "Geçmiş",
       href: "/satislar",
       icon: Receipt,
+    },
+    {
+      label: "Yedekle",
+      href: "/yedek",
+      icon: Database,
     },
   ];
 
@@ -132,7 +138,7 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation Bar (Tek elle kullanım için optimize) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 pb-safe">
-        <nav className="grid grid-cols-5 h-16 items-center px-1">
+        <nav className="grid grid-cols-6 h-16 items-center px-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;

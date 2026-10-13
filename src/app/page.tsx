@@ -14,6 +14,7 @@ import {
   Boxes,
   RefreshCw,
   ReceiptText,
+  Database,
 } from "lucide-react";
 
 interface DashboardData {
@@ -93,6 +94,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/yedek"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-teal-400 text-xs font-semibold hover:bg-slate-800 transition active:scale-95 cursor-pointer"
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>Yedek Al/Yükle</span>
+          </Link>
+
           <button
             onClick={fetchDashboardData}
             disabled={isLoading}
